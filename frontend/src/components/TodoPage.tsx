@@ -13,6 +13,11 @@ import { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch.ts";
 import { Task } from "../index";
 
+import AddTask from "./AddTask";
+import FilterBar from "./FilterBar";
+import TaskList from "./TaskList";
+import { TaskEditor } from "./TaskEditor";
+
 const TodoPage = () => {
   const api = useFetch();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -121,205 +126,39 @@ const TodoPage = () => {
       <Box display="flex" justifyContent="center" mt={5}>
         <Typography variant="h2">HDM Todo List</Typography>
       </Box>
-      <Box display="flex" justifyContent="center" mt={2} gap={2}>
-        <Select
-          value={filterStatus || ""}
-          onChange={(e) => setFilterStatus(e.target.value || null)}
-          displayEmpty
-          sx={{ minWidth: 120 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="Pending">Pending</MenuItem>
-          <MenuItem value="InProgress">In Progress</MenuItem>
-          <MenuItem value="Completed">Completed</MenuItem>
-        </Select>
-        <Select
-          value={sortField || ""}
-          onChange={(e) => setSortField(e.target.value || null)}
-          displayEmpty
-          sx={{ minWidth: 120 }}
-        >
-          <MenuItem value="">No Sorting</MenuItem>
-          <MenuItem value="name">Name</MenuItem>
-          <MenuItem value="status">Status</MenuItem>
-          <MenuItem value="priority">Priority</MenuItem>
-        </Select>
-        <Select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-          sx={{ minWidth: 120 }}
-        >
-          <MenuItem value="asc">Ascending</MenuItem>
-          <MenuItem value="desc">Descending</MenuItem>
-        </Select>
-      </Box>
-      <Box justifyContent="center" mt={5} flexDirection="column">
-        {Array.isArray(sortedTasks) && sortedTasks.length > 0 ? (
-          sortedTasks.map((task) => (
-            <Box
-              key={task.id}
-              display="flex"
-              justifyContent="center"
-              mt={2}
-              gap={1}
-              width="100%"
-            >
-              {editingTaskId === task.id ? (
-                <>
-                  <TextField
-                    size="small"
-                    value={editingTaskName}
-                    onChange={(e) => setEditingTaskName(e.target.value)}
-                    fullWidth
-                    sx={{ maxWidth: 350 }}
-                  />
-                  <Select
-                    value={editingTaskStatus}
-                    onChange={(e) => setEditingTaskStatus(e.target.value)}
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value="Pending">Pending</MenuItem>
-                    <MenuItem value="InProgress">In Progress</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
-                  </Select>
-                  <Select
-                    value={editingTaskPriority}
-                    onChange={(e) =>
-                      setEditingTaskPriority(Number(e.target.value))
-                    }
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value={1}>Important</MenuItem>
-                    <MenuItem value={2}>High</MenuItem>
-                    <MenuItem value={3}>Medium</MenuItem>
-                    <MenuItem value={4}>Banal</MenuItem>
-                  </Select>
-                  <IconButton
-                    color="success"
-                    disabled={!editingTaskName.trim()}
-                    onClick={handleSave}
-                  >
-                    <Check />
-                  </IconButton>
-                  <IconButton color="error" onClick={handleCancelEdit}>
-                    <Cancel />
-                  </IconButton>
-                </>
-              ) : (
-                <>
-                  <TextField
-                    size="small"
-                    value={task.name}
-                    fullWidth
-                    sx={{ maxWidth: 350 }}
-                    disabled
-                  />
-                  <Select
-                    value={task.status}
-                    onChange={(e) =>
-                      handleEdit({ ...task, status: e.target.value })
-                    }
-                    sx={{ minWidth: 120 }}
-                    disabled
-                  >
-                    <MenuItem value="Pending">Pending</MenuItem>
-                    <MenuItem value="InProgress">In Progress</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
-                  </Select>
-                  <Select
-                    value={task.priority}
-                    onChange={(e) =>
-                      handleEdit({ ...task, priority: Number(e.target.value) })
-                    }
-                    sx={{ minWidth: 120 }}
-                    disabled
-                  >
-                    <MenuItem value={1}>Important</MenuItem>
-                    <MenuItem value={2}>High</MenuItem>
-                    <MenuItem value={3}>Medium</MenuItem>
-                    <MenuItem value={4}>Banal</MenuItem>
-                  </Select>
-                  <Box>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEdit(task)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(task.id)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </>
-              )}
-            </Box>
-          ))
-        ) : (
-          <Typography variant="h6" textAlign="center">
-            No tasks found
-          </Typography>
-        )}
-
-        {isCreating ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            mt={2}
-            gap={1}
-          >
-            <TextField
-              size="small"
-              value={newTaskName}
-              onChange={(e) => setNewTaskName(e.target.value)}
-              placeholder="Enter new task"
-              sx={{ maxWidth: 350 }}
-              onKeyPress={(e) => e.key === "Enter" && handleSave()}
-              autoFocus
-            />
-            <Select
-              value={newTaskStatus}
-              onChange={(e) => setNewTaskStatus(e.target.value)}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="InProgress">In Progress</MenuItem>
-              <MenuItem value="Completed">Completed</MenuItem>
-            </Select>
-            <Select
-              value={newTaskPriority}
-              onChange={(e) => setNewTaskPriority(Number(e.target.value))}
-              sx={{ minWidth: 120 }}
-            >
-              <MenuItem value={1}>Important</MenuItem>
-              <MenuItem value={2}>High</MenuItem>
-              <MenuItem value={3}>Medium</MenuItem>
-              <MenuItem value={4}>Banal</MenuItem>
-            </Select>
-            <IconButton
-              color="success"
-              disabled={!newTaskName.trim()}
-              onClick={handleSave}
-            >
-              <Check />
-            </IconButton>
-          </Box>
-        ) : (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            mt={2}
-          >
-            <Button variant="outlined" onClick={() => setIsCreating(true)}>
-              Add Task
-            </Button>
-          </Box>
-        )}
-      </Box>
+      <FilterBar
+        filterStatus={filterStatus}
+        setFilterStatus={setFilterStatus}
+        sortField={sortField}
+        setSortField={setSortField}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+      />
+      <TaskList
+        tasks={sortedTasks}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        editingTaskId={editingTaskId}
+        handleSave={handleSave}
+        handleCancelEdit={handleCancelEdit}
+        editingTaskName={editingTaskName}
+        setEditingTaskName={setEditingTaskName}
+        editingTaskStatus={editingTaskStatus}
+        setEditingTaskStatus={setEditingTaskStatus}
+        editingTaskPriority={editingTaskPriority}
+        setEditingTaskPriority={setEditingTaskPriority}
+      />
+      <AddTask
+        isCreating={isCreating}
+        setIsCreating={setIsCreating}
+        newTaskName={newTaskName}
+        setNewTaskName={setNewTaskName}
+        newTaskStatus={newTaskStatus}
+        setNewTaskStatus={setNewTaskStatus}
+        newTaskPriority={newTaskPriority}
+        setNewTaskPriority={setNewTaskPriority}
+        handleSave={handleSave}
+      />
     </Container>
   );
 };
