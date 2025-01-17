@@ -11,13 +11,13 @@ export default class SaveTaskUseCase
   constructor(private readonly taskRepository: TaskRepository) {}
 
   async handle(dto: SaveTaskDto): Promise<Task> {
-    // Validate the task name
+    // Validate the task name no empty
     if (!dto.name || dto.name.trim().length === 0) {
       throw new BadRequestException('Task name is required');
     }
 
     try {
-      // If id exists, update the task, otherwise create a new one
+      // If id exists, update the task, else create a new one
       return await this.taskRepository.save({ name: dto.name });
     } catch (error) {
       throw new BadRequestException(error.message);

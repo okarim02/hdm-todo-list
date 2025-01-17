@@ -34,7 +34,6 @@ export default class TaskRepository {
   ) {
     const id = data.id as number | undefined;
     if (id == null) {
-      // Create a new task
       this.logger.log('Creating a new task with data:', { name: data.name });
       try {
         return await this.prisma.task.create({
@@ -46,13 +45,12 @@ export default class TaskRepository {
       }
     }
 
-    // Check if the task exists
+    // Check if the task exists before updating
     const existingTask = await this.findById(id);
     if (!existingTask) {
       throw new Error('Task with id ' + id + ' not found');
     }
 
-    // Update the task
     this.logger.log('Updating task with ID:', id);
     try {
       return await this.prisma.task.update({
