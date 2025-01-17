@@ -27,7 +27,6 @@ const TaskList = ({
             justifyContent="center"
             mt={2}
             gap={1}
-            width="100%"
           >
             {editingTaskId === task.id ? (
               <TaskEditor
