@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Task` ADD COLUMN `priority` INTEGER NOT NULL DEFAULT 4,
+    ADD COLUMN `status` VARCHAR(191) NOT NULL DEFAULT 'Pending';

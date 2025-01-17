@@ -17,6 +17,9 @@ export default class SaveTask
     if (!Object.values(TaskStatus).includes(dto.status)) {
       throw new BadRequestException('Invalid task status');
     }
+    if (dto.priority == null || dto.priority < 1 || dto.priority > 4) {
+      throw new BadRequestException('Invalid task priority');
+    }
     try {
       await this.taskRepository.save(dto);
     } catch (error) {

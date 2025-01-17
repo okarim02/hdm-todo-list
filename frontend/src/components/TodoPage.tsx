@@ -18,10 +18,12 @@ const TodoPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskName, setNewTaskName] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState("Pending");
+  const [newTaskPriority, setNewTaskPriority] = useState(4);
   const [isCreating, setIsCreating] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskName, setEditingTaskName] = useState("");
   const [editingTaskStatus, setEditingTaskStatus] = useState("Pending");
+  const [editingTaskPriority, setEditingTaskPriority] = useState(4);
 
   const handleFetchTasks = async () => {
     const response = await api.get("/tasks");
@@ -40,7 +42,6 @@ const TodoPage = () => {
   };
 
   const handleSave = async () => {
-    console.log("Saving task id... IN PROGRESS", editingTaskId);
     try {
       if (!editingTaskName.trim() && !newTaskName.trim()) {
         console.error("Task name is required");
@@ -51,19 +52,23 @@ const TodoPage = () => {
             id: editingTaskId,
             name: editingTaskName.trim(),
             status: editingTaskStatus,
+            priority: editingTaskPriority,
           })
         : await api.post("/tasks", {
             name: newTaskName.trim(),
             status: newTaskStatus,
+            priority: newTaskPriority,
           });
 
       if (response !== false) {
         setNewTaskName("");
         setNewTaskStatus("Pending");
+        setNewTaskPriority(4);
         setIsCreating(false);
         setEditingTaskId(null);
         setEditingTaskName("");
         setEditingTaskStatus("Pending");
+        setEditingTaskPriority(4);
         await handleFetchTasks();
       } else {
         console.error("Failed to save task");
@@ -74,22 +79,21 @@ const TodoPage = () => {
   };
 
   const handleEdit = (task: Task) => {
-    console.log("Editing in progress ... for the id of", task.id);
     setEditingTaskId(task.id);
     setEditingTaskName(task.name);
     setEditingTaskStatus(task.status);
+    setEditingTaskPriority(task.priority);
   };
 
   const handleCancelEdit = () => {
     setEditingTaskId(null);
     setEditingTaskName("");
     setEditingTaskStatus("Pending");
+    setEditingTaskPriority(4);
   };
 
   useEffect(() => {
-    (async () => {
-      handleFetchTasks();
-    })();
+    handleFetchTasks();
   }, []);
 
   return (
@@ -126,6 +130,18 @@ const TodoPage = () => {
                     <MenuItem value="InProgress">In Progress</MenuItem>
                     <MenuItem value="Completed">Completed</MenuItem>
                   </Select>
+                  <Select
+                    value={editingTaskPriority}
+                    onChange={(e) =>
+                      setEditingTaskPriority(Number(e.target.value))
+                    }
+                    sx={{ minWidth: 120 }}
+                  >
+                    <MenuItem value={1}>Important</MenuItem>
+                    <MenuItem value={2}>High</MenuItem>
+                    <MenuItem value={3}>Medium</MenuItem>
+                    <MenuItem value={4}>Banal</MenuItem>
+                  </Select>
                   <IconButton
                     color="success"
                     disabled={!editingTaskName.trim()}
@@ -157,6 +173,19 @@ const TodoPage = () => {
                     <MenuItem value="Pending">Pending</MenuItem>
                     <MenuItem value="InProgress">In Progress</MenuItem>
                     <MenuItem value="Completed">Completed</MenuItem>
+                  </Select>
+                  <Select
+                    value={task.priority}
+                    onChange={(e) =>
+                      handleEdit({ ...task, priority: Number(e.target.value) })
+                    }
+                    sx={{ minWidth: 120 }}
+                    disabled
+                  >
+                    <MenuItem value={1}>Important</MenuItem>
+                    <MenuItem value={2}>High</MenuItem>
+                    <MenuItem value={3}>Medium</MenuItem>
+                    <MenuItem value={4}>Banal</MenuItem>
                   </Select>
                   <Box>
                     <IconButton
@@ -207,6 +236,16 @@ const TodoPage = () => {
               <MenuItem value="Pending">Pending</MenuItem>
               <MenuItem value="InProgress">In Progress</MenuItem>
               <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
+            <Select
+              value={newTaskPriority}
+              onChange={(e) => setNewTaskPriority(Number(e.target.value))}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value={1}>Important</MenuItem>
+              <MenuItem value={2}>High</MenuItem>
+              <MenuItem value={3}>Medium</MenuItem>
+              <MenuItem value={4}>Banal</MenuItem>
             </Select>
             <IconButton
               color="success"
