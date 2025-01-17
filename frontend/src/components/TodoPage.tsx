@@ -4,6 +4,8 @@ import {
   Button,
   Container,
   IconButton,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -15,9 +17,11 @@ const TodoPage = () => {
   const api = useFetch();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskName, setNewTaskName] = useState("");
+  const [newTaskStatus, setNewTaskStatus] = useState("Pending");
   const [isCreating, setIsCreating] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTaskName, setEditingTaskName] = useState("");
+  const [editingTaskStatus, setEditingTaskStatus] = useState("Pending");
 
   const handleFetchTasks = async () => {
     const response = await api.get("/tasks");
@@ -46,14 +50,20 @@ const TodoPage = () => {
         ? await api.patch(`/tasks/${editingTaskId}`, {
             id: editingTaskId,
             name: editingTaskName.trim(),
+            status: editingTaskStatus,
           })
-        : await api.post("/tasks", { name: newTaskName.trim() });
+        : await api.post("/tasks", {
+            name: newTaskName.trim(),
+            status: newTaskStatus,
+          });
 
       if (response !== false) {
         setNewTaskName("");
+        setNewTaskStatus("Pending");
         setIsCreating(false);
         setEditingTaskId(null);
         setEditingTaskName("");
+        setEditingTaskStatus("Pending");
         await handleFetchTasks();
       } else {
         console.error("Failed to save task");
@@ -67,11 +77,13 @@ const TodoPage = () => {
     console.log("Editing in progress ... for the id of", task.id);
     setEditingTaskId(task.id);
     setEditingTaskName(task.name);
+    setEditingTaskStatus(task.status);
   };
 
   const handleCancelEdit = () => {
     setEditingTaskId(null);
     setEditingTaskName("");
+    setEditingTaskStatus("Pending");
   };
 
   useEffect(() => {
@@ -105,6 +117,15 @@ const TodoPage = () => {
                     fullWidth
                     sx={{ maxWidth: 350 }}
                   />
+                  <Select
+                    value={editingTaskStatus}
+                    onChange={(e) => setEditingTaskStatus(e.target.value)}
+                    sx={{ minWidth: 120 }}
+                  >
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="InProgress">In Progress</MenuItem>
+                    <MenuItem value="Completed">Completed</MenuItem>
+                  </Select>
                   <IconButton
                     color="success"
                     disabled={!editingTaskName.trim()}
@@ -125,6 +146,18 @@ const TodoPage = () => {
                     sx={{ maxWidth: 350 }}
                     disabled
                   />
+                  <Select
+                    value={task.status}
+                    onChange={(e) =>
+                      handleEdit({ ...task, status: e.target.value })
+                    }
+                    sx={{ minWidth: 120 }}
+                    disabled
+                  >
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="InProgress">In Progress</MenuItem>
+                    <MenuItem value="Completed">Completed</MenuItem>
+                  </Select>
                   <Box>
                     <IconButton
                       color="primary"
@@ -166,6 +199,15 @@ const TodoPage = () => {
               onKeyPress={(e) => e.key === "Enter" && handleSave()}
               autoFocus
             />
+            <Select
+              value={newTaskStatus}
+              onChange={(e) => setNewTaskStatus(e.target.value)}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="InProgress">In Progress</MenuItem>
+              <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
             <IconButton
               color="success"
               disabled={!newTaskName.trim()}
