@@ -9,12 +9,14 @@ export default function useFetch() {
       const requestOptions = {
         method,
         headers: myHeaders,
-        ...(data ? { body:  JSON.stringify(data) } : {}),
+        ...(data ? { body: JSON.stringify(data) } : {}),
       };
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}${route}`, requestOptions);
 
-      return response.json();
+      // fix an issue with an empty response (didn't found another way to fix it)
+      const text = await response.text();
+      return text ? JSON.parse(text) : {};
     } catch (error) {
       console.error(error);
 
