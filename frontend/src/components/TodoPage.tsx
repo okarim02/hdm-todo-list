@@ -25,6 +25,10 @@ const TodoPage = () => {
   const [editingTaskStatus, setEditingTaskStatus] = useState("Pending");
   const [editingTaskPriority, setEditingTaskPriority] = useState(4);
 
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
   const handleFetchTasks = async () => {
     const response = await api.get("/tasks");
     if (response) {
@@ -96,14 +100,62 @@ const TodoPage = () => {
     handleFetchTasks();
   }, []);
 
+  const filteredTasks = tasks.filter((task) => {
+    if (filterStatus && task.status !== filterStatus) {
+      return false;
+    }
+    return true;
+  });
+
+  const sortedTasks = filteredTasks.sort((a, b) => {
+    if (!sortField) return 0;
+    const fieldA = a[sortField as keyof Task];
+    const fieldB = b[sortField as keyof Task];
+    if (fieldA < fieldB) return sortOrder === "asc" ? -1 : 1;
+    if (fieldA > fieldB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
   return (
     <Container>
       <Box display="flex" justifyContent="center" mt={5}>
         <Typography variant="h2">HDM Todo List</Typography>
       </Box>
+      <Box display="flex" justifyContent="center" mt={2} gap={2}>
+        <Select
+          value={filterStatus || ""}
+          onChange={(e) => setFilterStatus(e.target.value || null)}
+          displayEmpty
+          sx={{ minWidth: 120 }}
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="InProgress">In Progress</MenuItem>
+          <MenuItem value="Completed">Completed</MenuItem>
+        </Select>
+        <Select
+          value={sortField || ""}
+          onChange={(e) => setSortField(e.target.value || null)}
+          displayEmpty
+          sx={{ minWidth: 120 }}
+        >
+          <MenuItem value="">No Sorting</MenuItem>
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="status">Status</MenuItem>
+          <MenuItem value="priority">Priority</MenuItem>
+        </Select>
+        <Select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+          sx={{ minWidth: 120 }}
+        >
+          <MenuItem value="asc">Ascending</MenuItem>
+          <MenuItem value="desc">Descending</MenuItem>
+        </Select>
+      </Box>
       <Box justifyContent="center" mt={5} flexDirection="column">
-        {Array.isArray(tasks) && tasks.length > 0 ? (
-          tasks.map((task) => (
+        {Array.isArray(sortedTasks) && sortedTasks.length > 0 ? (
+          sortedTasks.map((task) => (
             <Box
               key={task.id}
               display="flex"
